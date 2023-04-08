@@ -30,6 +30,7 @@ class Pluginval(ConanFile):
 
     def generate(self):
         toolchain = CMakeToolchain(self)
+        toolchain.blocks.remove("apple_system") # Because Conan forces x86_64 build(from settings)
         toolchain.generate()
     
     def build(self):
