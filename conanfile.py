@@ -5,18 +5,19 @@ from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout
 
 import os
 
-class Pluginval(ConanFile):
-    name="pluginval"
-    version="1.0.3"
-    channel="release"
-    user="pluginval"
-    author="pluginval"
-    homepage="https://github.com/Tracktion/pluginval"
-    url="https://github.com/Tracktion/pluginval.git"
-    description="Cross platform plugin testing and validation tool"
-    license="https://github.com/Tracktion/pluginval/blob/master/LICENSE"
 
-    settings="os", "compiler", "arch", "build_type"
+class Pluginval(ConanFile):
+    name = "pluginval"
+    version = "1.0.3"
+    channel = "release"
+    user = "pluginval"
+    author = "pluginval"
+    homepage = "https://github.com/Tracktion/pluginval"
+    url = "https://github.com/Tracktion/pluginval.git"
+    description = "Cross platform plugin testing and validation tool"
+    license = "https://github.com/Tracktion/pluginval/blob/master/LICENSE"
+
+    settings = "os", "compiler", "arch", "build_type"
     package_type = "application"
     exports_sources = "*", "!.vscode", "!build"
 
@@ -27,19 +28,18 @@ class Pluginval(ConanFile):
         rmdir(self, "pluginval")
         Git(self).run(f"clone --recurse-submodules --depth 1 --branch v{self.version} {self.url}")
 
-
     def generate(self):
         toolchain = CMakeToolchain(self)
-        toolchain.blocks.remove("apple_system") # Because Conan forces x86_64 build(from settings)
+        toolchain.blocks.remove("apple_system")  # Because Conan forces x86_64 build(from settings)
         toolchain.generate()
-    
+
     def build(self):
         cmake = CMake(self)
         cmake.configure(build_script_folder=os.path.join(str(self.source_folder), "pluginval"))
         cmake.build()
 
     def package(self):
-        copy(self, "*", src=os.path.join(str(self.build_folder), "pluginval_artefacts", "Release"), dst=os.path.join(str(self.package_folder), "bin"))
+        copy(self, "*", src=os.path.join(str(self.build_folder), "pluginval_artefacts", str(self.settings.build_type)), dst=os.path.join(str(self.package_folder), "bin"))
 
     def package_info(self):
         if self.settings.os == "Macos":
